@@ -49,6 +49,11 @@ const UNWRAP_TAGS = new Set(['html', 'body'])
 function filterTree(nodes: DomNode[]): DomNode[] {
   const result: DomNode[] = []
   for (const node of nodes) {
+    // Skip whitespace-only text nodes
+    if (node.type === 'text' && !(node.textContent || '').trim()) continue
+    // Skip comment nodes
+    if (node.type === 'comment') continue
+
     if (node.type === 'element' && node.tagName) {
       const tag = node.tagName.toLowerCase()
       if (UNWRAP_TAGS.has(tag)) {
