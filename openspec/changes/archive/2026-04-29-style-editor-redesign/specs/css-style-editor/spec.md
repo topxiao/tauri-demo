@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Display selected element info
 样式编辑器顶部 SHALL 显示当前选中元素的标签名和 class/id 信息。
@@ -26,28 +26,24 @@
 - **WHEN** 没有选中任何 DOM 元素
 - **THEN** 样式编辑器显示空状态提示"请在 DOM 树中选择一个元素"
 
-### Requirement: Edit inline styles
-系统 SHALL 支持编辑元素的 `style` 属性中的 CSS 属性。内联样式作为键值对对象存储在 DomNode.attributes.style 中。
+## REMOVED Requirements
 
-#### Scenario: Modify inline style property
-- **WHEN** 用户在样式面板中修改 padding 值从 `10px` 为 `20px`
-- **THEN** DomNode.attributes.style 中对应值更新，iframe 预览实时更新
+### Requirement: Style source tabs
+**Reason**: 重构为统一内联样式编辑面板，移除三栏 tabs 切换
+**Migration**: style-tag 和 external CSS 可视化编辑可在后续迭代中通过其他 UI 形式加回
 
-#### Scenario: Add inline style property
-- **WHEN** 用户在样式面板中新增 `color: red`
-- **THEN** 新属性追加到 style 属性字符串末尾，iframe 预览实时更新
+### Requirement: Display matching CSS rules
+**Reason**: 移除 tabs 后不再按来源展示规则列表
+**Migration**: CSS 规则匹配功能保留在底层 composable 中，后续可加回高级视图
 
-### Requirement: Simple selector matching
-系统 SHALL 根据选中元素的 tagName、class 列表、id 对 CSS AST 中的选择器做精确匹配。支持 `.className`、`#id`、`tagName` 三种简单选择器格式。
+### Requirement: Edit style tag rules
+**Reason**: 面板重构仅聚焦内联样式编辑
+**Migration**: style-tag 编辑功能可在后续迭代中通过独立入口加回
 
-#### Scenario: Match class selector
-- **WHEN** 选中元素有 `class="container"`，CSS 中有 `.container { ... }` 规则
-- **THEN** 该规则在样式编辑器中展示
+### Requirement: Edit external CSS file rules
+**Reason**: 面板重构仅聚焦内联样式编辑
+**Migration**: external CSS 编辑功能可在后续迭代中通过独立入口加回
 
-#### Scenario: Match tag selector
-- **WHEN** 选中元素是 `<div>`，CSS 中有 `div { box-sizing: border-box }` 规则
-- **THEN** 该规则在样式编辑器中展示
-
-#### Scenario: No matching rules
-- **WHEN** 选中元素不匹配任何 CSS 规则
-- **THEN** 样式编辑器显示"该元素暂无匹配的 CSS 规则"
+### Requirement: Grouped style property panels
+**Reason**: 替换为设计工具风格的分区面板（详见 style-panel-ui capability）
+**Migration**: 新面板覆盖原有所有属性并扩展更多常用 CSS 属性
