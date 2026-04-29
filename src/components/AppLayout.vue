@@ -270,7 +270,7 @@ onUnmounted(() => {
 }
 
 .left-panel {
-  width: 280px;
+  width: 260px;
   flex-shrink: 0;
   border-right: 1px solid #e4e7ed;
   overflow-y: auto;
@@ -278,23 +278,18 @@ onUnmounted(() => {
 
 .center-panel {
   flex: 1;
+  min-width: 400px;
   padding: 12px;
   overflow: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
+  flex-direction: column;
 }
 
 .right-panel {
-  width: 300px;
+  width: 340px;
   flex-shrink: 0;
   border-left: 1px solid #e4e7ed;
-  padding: 12px;
-  overflow: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>

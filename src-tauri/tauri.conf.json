@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "tauri-demo",
-        "width": 800,
-        "height": 600
+        "title": "HTML 可视化编辑器",
+        "width": 1400,
+        "height": 900
       }
     ],
     "security": {
