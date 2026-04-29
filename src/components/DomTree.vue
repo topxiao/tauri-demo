@@ -271,6 +271,11 @@ function handleNodeDrop(
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0 4px;
+}
+
+.dom-tree :deep(.el-tree) {
+  padding: 4px;
 }
 
 .toolbar {
