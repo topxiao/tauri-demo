@@ -221,18 +221,28 @@ onUnmounted(() => {
   padding: 0;
 }
 
-/* highlight.js GitHub Dark theme overrides */
-.source-code :deep(.hljs-keyword) { color: #ff7b72; }
-.source-code :deep(.hljs-tag) { color: #7ee787; }
+/* highlight.js high-contrast dark theme */
+.source-code :deep(code) {
+  color: #d4d4d4;
+}
+.source-code :deep(.hljs-keyword) { color: #ff6b9d; }
+.source-code :deep(.hljs-tag) { color: #56d364; }
+.source-code :deep(.hljs-name) { color: #7ee787; }
 .source-code :deep(.hljs-attr) { color: #79c0ff; }
 .source-code :deep(.hljs-string) { color: #a5d6ff; }
 .source-code :deep(.hljs-comment) { color: #8b949e; font-style: italic; }
 .source-code :deep(.hljs-variable) { color: #ffa657; }
 .source-code :deep(.hljs-built_in) { color: #d2a8ff; }
-.source-code :deep(.hljs-name) { color: #7ee787; }
 .source-code :deep(.hljs-title) { color: #d2a8ff; }
 .source-code :deep(.hljs-number) { color: #79c0ff; }
 .source-code :deep(.hljs-selector-class) { color: #7ee787; }
 .source-code :deep(.hljs-selector-id) { color: #ffa657; }
 .source-code :deep(.hljs-meta) { color: #8b949e; }
+.source-code :deep(.hljs-symbol) { color: #ffa657; }
+.source-code :deep(.hljs-params) { color: #d4d4d4; }
+.source-code :deep(.hljs-property) { color: #79c0ff; }
+.source-code :deep(.hljs-punctuation) { color: #c9d1d9; }
+.source-code :deep(.hljs-operator) { color: #ff7b72; }
+.source-code :deep(.hljs-doctag) { color: #ff7b72; }
+.source-code :deep(.hljs-type) { color: #ffa657; }
 </style>

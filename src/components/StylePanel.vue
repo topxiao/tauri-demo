@@ -16,6 +16,46 @@ const emit = defineEmits<{
 
 const { parseInlineStyles } = useCssEditor()
 
+const ALL_SECTIONS = ['margin', 'padding', 'size', 'boxFill', 'overflowX', 'overflowY', 'flex', 'font', 'textDecor', 'background', 'border', 'effect', 'custom'] as const
+
+const CATEGORY_SECTIONS: Record<string, string[]> = {
+  block: [...ALL_SECTIONS],
+  textInline: ['margin', 'padding', 'font', 'textDecor', 'background', 'border', 'effect', 'custom'],
+  heading: ['margin', 'padding', 'size', 'font', 'textDecor', 'background', 'border', 'effect', 'custom'],
+  media: ['margin', 'padding', 'size', 'background', 'border', 'effect', 'custom'],
+  iframe: ['margin', 'padding', 'size', 'overflowX', 'overflowY', 'background', 'border', 'effect', 'custom'],
+  listItem: ['margin', 'padding', 'size', 'font', 'textDecor', 'background', 'border', 'effect', 'custom'],
+  tablePart: ['margin', 'padding', 'size', 'background', 'border', 'effect', 'custom'],
+  formElement: ['margin', 'padding', 'size', 'font', 'textDecor', 'background', 'border', 'effect', 'custom'],
+}
+
+const TAG_CATEGORIES: Record<string, string> = {
+  'div': 'block', 'section': 'block', 'article': 'block', 'aside': 'block',
+  'main': 'block', 'header': 'block', 'footer': 'block', 'nav': 'block',
+  'figure': 'block', 'figcaption': 'block', 'details': 'block', 'summary': 'block',
+  'dialog': 'block', 'form': 'block', 'fieldset': 'block',
+  'span': 'textInline', 'a': 'textInline', 'em': 'textInline', 'strong': 'textInline',
+  'b': 'textInline', 'i': 'textInline', 'u': 'textInline', 's': 'textInline',
+  'mark': 'textInline', 'small': 'textInline', 'sub': 'textInline', 'sup': 'textInline',
+  'abbr': 'textInline', 'cite': 'textInline', 'q': 'textInline', 'time': 'textInline',
+  'del': 'textInline', 'ins': 'textInline', 'address': 'textInline',
+  'label': 'textInline', 'legend': 'textInline', 'code': 'textInline',
+  'h1': 'heading', 'h2': 'heading', 'h3': 'heading', 'h4': 'heading',
+  'h5': 'heading', 'h6': 'heading', 'p': 'heading', 'blockquote': 'heading', 'pre': 'heading',
+  'img': 'media', 'video': 'media', 'audio': 'media', 'canvas': 'media',
+  'svg': 'media', 'embed': 'media', 'object': 'media', 'picture': 'media',
+  'source': 'media', 'map': 'media', 'area': 'media',
+  'iframe': 'iframe',
+  'ul': 'listItem', 'ol': 'listItem', 'li': 'listItem',
+  'dl': 'listItem', 'dt': 'listItem', 'dd': 'listItem',
+  'table': 'tablePart', 'thead': 'tablePart', 'tbody': 'tablePart',
+  'tfoot': 'tablePart', 'tr': 'tablePart', 'td': 'tablePart', 'th': 'tablePart',
+  'caption': 'tablePart', 'colgroup': 'tablePart', 'col': 'tablePart',
+  'input': 'formElement', 'button': 'formElement', 'select': 'formElement',
+  'option': 'formElement', 'optgroup': 'formElement', 'textarea': 'formElement',
+  'datalist': 'formElement', 'output': 'formElement', 'progress': 'formElement', 'meter': 'formElement',
+}
+
 const collapsed = ref<Record<string, boolean>>({
   margin: false,
   padding: false,
@@ -39,6 +79,13 @@ function toggleSection(key: string) {
 const form = ref<Record<string, string>>({})
 
 const isFlex = computed(() => form.value['display'] === 'flex')
+
+const visibleSections = computed(() => {
+  const tag = (props.element.tagName || '').toLowerCase()
+  const category = TAG_CATEGORIES[tag]
+  const sections = category ? CATEGORY_SECTIONS[category] : [...ALL_SECTIONS]
+  return new Set(sections)
+})
 
 const bgMode = computed(() => {
   const bgImg = form.value['background-image']
@@ -172,7 +219,7 @@ function applyCustomProp(index: number) {
 <template>
   <div class="style-panel">
     <!-- 外边距 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('margin')" class="panel-section">
       <div class="section-header" @click="toggleSection('margin')">
         <span class="section-arrow">{{ collapsed.margin ? '▶' : '▼' }}</span>
         <span class="section-title">外边距</span>
@@ -198,7 +245,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 间距（内边距） -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('padding')" class="panel-section">
       <div class="section-header" @click="toggleSection('padding')">
         <span class="section-arrow">{{ collapsed.padding ? '▶' : '▼' }}</span>
         <span class="section-title">间距</span>
@@ -224,7 +271,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 尺寸 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('size')" class="panel-section">
       <div class="section-header" @click="toggleSection('size')">
         <span class="section-arrow">{{ collapsed.size ? '▶' : '▼' }}</span>
         <span class="section-title">尺寸</span>
@@ -250,7 +297,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 盒宽填充 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('boxFill')" class="panel-section">
       <div class="section-header" @click="toggleSection('boxFill')">
         <span class="section-arrow">{{ collapsed.boxFill ? '▶' : '▼' }}</span>
         <span class="section-title">盒宽填充</span>
@@ -270,7 +317,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 横轴溢出 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('overflowX')" class="panel-section">
       <div class="section-header" @click="toggleSection('overflowX')">
         <span class="section-arrow">{{ collapsed.overflowX ? '▶' : '▼' }}</span>
         <span class="section-title">横轴溢出</span>
@@ -290,7 +337,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 纵轴溢出 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('overflowY')" class="panel-section">
       <div class="section-header" @click="toggleSection('overflowY')">
         <span class="section-arrow">{{ collapsed.overflowY ? '▶' : '▼' }}</span>
         <span class="section-title">纵轴溢出</span>
@@ -310,7 +357,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- Flex 布局（条件显示） -->
-    <section v-if="isFlex" class="panel-section">
+    <section v-if="visibleSections.has('flex') && isFlex" class="panel-section">
       <div class="section-header" @click="toggleSection('flex')">
         <span class="section-arrow">{{ collapsed.flex ? '▶' : '▼' }}</span>
         <span class="section-title">Flex 布局</span>
@@ -375,7 +422,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 字体 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('font')" class="panel-section">
       <div class="section-header" @click="toggleSection('font')">
         <span class="section-arrow">{{ collapsed.font ? '▶' : '▼' }}</span>
         <span class="section-title">字体</span>
@@ -422,7 +469,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 文字装饰 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('textDecor')" class="panel-section">
       <div class="section-header" @click="toggleSection('textDecor')">
         <span class="section-arrow">{{ collapsed.textDecor ? '▶' : '▼' }}</span>
         <span class="section-title">文字装饰</span>
@@ -448,7 +495,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 背景设置 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('background')" class="panel-section">
       <div class="section-header" @click="toggleSection('background')">
         <span class="section-arrow">{{ collapsed.background ? '▶' : '▼' }}</span>
         <span class="section-title">背景设置</span>
@@ -484,7 +531,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 边框 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('border')" class="panel-section">
       <div class="section-header" @click="toggleSection('border')">
         <span class="section-arrow">{{ collapsed.border ? '▶' : '▼' }}</span>
         <span class="section-title">边框</span>
@@ -532,7 +579,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 效果 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('effect')" class="panel-section">
       <div class="section-header" @click="toggleSection('effect')">
         <span class="section-arrow">{{ collapsed.effect ? '▶' : '▼' }}</span>
         <span class="section-title">效果</span>
@@ -566,7 +613,7 @@ function applyCustomProp(index: number) {
     </section>
 
     <!-- 自定义属性 -->
-    <section class="panel-section">
+    <section v-if="visibleSections.has('custom')" class="panel-section">
       <div class="section-header" @click="toggleSection('custom')">
         <span class="section-arrow">{{ collapsed.custom ? '▶' : '▼' }}</span>
         <span class="section-title">自定义属性</span>
