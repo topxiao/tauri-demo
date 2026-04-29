@@ -75,6 +75,6 @@ const activeTab = ref<'dom' | 'files'>('dom')
 
 .left-content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
 }
 </style>

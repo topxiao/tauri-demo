@@ -19,9 +19,29 @@ const contextMenu = ref({
 const inlineEditId = ref<string | null>(null)
 const inlineEditText = ref('')
 
-const HIDDEN_TAGS = new Set([
-  'head', 'meta', 'title', 'link', 'script', 'style',
-  'base', 'noscript', 'template', 'br', 'hr', 'wbr',
+const VISIBLE_TAGS = new Set([
+  // 结构
+  'div', 'span', 'section', 'article', 'aside', 'main', 'header', 'footer',
+  'nav', 'figure', 'figcaption', 'details', 'summary', 'dialog',
+  // 文本
+  'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'code',
+  'em', 'strong', 'b', 'i', 'u', 's', 'mark', 'small', 'sub', 'sup',
+  'abbr', 'cite', 'q', 'time', 'del', 'ins', 'address',
+  // 列表
+  'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+  // 表格
+  'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'caption',
+  'colgroup', 'col',
+  // 表单
+  'form', 'input', 'button', 'select', 'option', 'optgroup', 'textarea',
+  'label', 'fieldset', 'legend', 'datalist', 'output', 'progress', 'meter',
+  // 媒体
+  'img', 'video', 'audio', 'source', 'canvas', 'svg', 'iframe', 'embed',
+  'object', 'picture', 'map', 'area',
+  // 链接
+  'a',
+  // 其他
+  'hr', 'br', 'wbr', 'ruby', 'rt', 'rp',
 ])
 
 const UNWRAP_TAGS = new Set(['html', 'body'])
@@ -31,13 +51,13 @@ function filterTree(nodes: DomNode[]): DomNode[] {
   for (const node of nodes) {
     if (node.type === 'element' && node.tagName) {
       const tag = node.tagName.toLowerCase()
-      if (HIDDEN_TAGS.has(tag)) continue
       if (UNWRAP_TAGS.has(tag)) {
         if (node.children) {
           result.push(...filterTree(node.children))
         }
         continue
       }
+      if (!VISIBLE_TAGS.has(tag)) continue
     }
     if (node.children) {
       result.push({ ...node, children: filterTree(node.children) })
