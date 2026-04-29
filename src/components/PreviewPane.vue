@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import hljs from 'highlight.js/lib/core'
+import xml from 'highlight.js/lib/languages/xml'
+import freemarkerLang from '../utils/freemarkerLang'
 import { useDomTreeStore } from '../stores/domTree'
 import { useProjectStore } from '../stores/project'
 import { useHtmlParser } from '../composables/useHtmlParser'
 import { useIframeSync } from '../composables/useIframeSync'
+
+hljs.registerLanguage('html', xml)
+hljs.registerLanguage('ftl', freemarkerLang)
 
 const domTreeStore = useDomTreeStore()
 const projectStore = useProjectStore()
@@ -40,6 +46,19 @@ const sourceCode = computed(() => {
   const tree = domTreeStore.domTree
   if (tree.length === 0) return ''
   return domTreeToHtml(tree)
+})
+
+const highlightedSource = computed(() => {
+  const code = sourceCode.value
+  if (!code) return ''
+  const fileName = projectStore.currentFileName || ''
+  const isFtl = fileName.endsWith('.ftl') || fileName.endsWith('.ftlh')
+  const lang = isFtl ? 'ftl' : 'html'
+  try {
+    return hljs.highlight(code, { language: lang }).value
+  } catch {
+    return code
+  }
 })
 
 function onIframeLoad() {
@@ -106,7 +125,7 @@ onUnmounted(() => {
       @load="onIframeLoad"
     />
     <div v-else class="source-view">
-      <pre class="source-code">{{ sourceCode }}</pre>
+      <pre class="source-code"><code v-html="highlightedSource"></code></pre>
     </div>
   </div>
 </template>
@@ -191,8 +210,29 @@ onUnmounted(() => {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 13px;
   line-height: 1.5;
-  color: #d4d4d4;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+.source-code :deep(code) {
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+/* highlight.js GitHub Dark theme overrides */
+.source-code :deep(.hljs-keyword) { color: #ff7b72; }
+.source-code :deep(.hljs-tag) { color: #7ee787; }
+.source-code :deep(.hljs-attr) { color: #79c0ff; }
+.source-code :deep(.hljs-string) { color: #a5d6ff; }
+.source-code :deep(.hljs-comment) { color: #8b949e; font-style: italic; }
+.source-code :deep(.hljs-variable) { color: #ffa657; }
+.source-code :deep(.hljs-built_in) { color: #d2a8ff; }
+.source-code :deep(.hljs-name) { color: #7ee787; }
+.source-code :deep(.hljs-title) { color: #d2a8ff; }
+.source-code :deep(.hljs-number) { color: #79c0ff; }
+.source-code :deep(.hljs-selector-class) { color: #7ee787; }
+.source-code :deep(.hljs-selector-id) { color: #ffa657; }
+.source-code :deep(.hljs-meta) { color: #8b949e; }
 </style>
