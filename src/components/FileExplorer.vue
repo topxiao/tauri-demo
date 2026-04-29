@@ -15,7 +15,6 @@ const treeProps = computed(() => ({
 
 function handleNodeClick(data: FileEntry) {
   if (data.isDir) return
-  if (!isHtmlFile(data.name)) return
   loadFileWithConfirm(data.path)
 }
 
@@ -69,7 +68,7 @@ async function loadFileWithConfirm(filePath: string) {
           class="tree-node"
           :class="{
             'is-html': !data.isDir && isHtmlFile(data.name),
-            'is-other': !data.isDir && !isHtmlFile(data.name),
+            'is-file': !data.isDir && !isHtmlFile(data.name),
             'is-current': data.path === projectStore.currentFilePath,
           }"
         >
@@ -118,9 +117,9 @@ export default {
   cursor: pointer;
 }
 
-.tree-node.is-other {
-  color: #c0c4cc;
-  cursor: default;
+.tree-node.is-file {
+  color: #909399;
+  cursor: pointer;
 }
 
 .tree-node.is-current {

@@ -169,9 +169,19 @@ async function parseAndLoadCss(html: string) {
   styleStateStore.setSources(sources)
 }
 
+function isHtmlFileName(name: string): boolean {
+  return name.endsWith('.html') || name.endsWith('.htm') || name.endsWith('.ftl') || name.endsWith('.ftlh')
+}
+
 // Watch currentFileContent -> parse DOM tree and CSS sources
 watch(() => projectStore.currentFileContent, async (html) => {
   if (!html) return
+
+  const fileName = projectStore.currentFileName || ''
+  if (!isHtmlFileName(fileName)) {
+    domTreeStore.setTree([])
+    return
+  }
 
   const domNodes = parseToDomTree(html)
   domTreeStore.setTree(domNodes)

@@ -2,6 +2,9 @@
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import hljs from 'highlight.js/lib/core'
 import xml from 'highlight.js/lib/languages/xml'
+import css from 'highlight.js/lib/languages/css'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
 import freemarkerLang from '../utils/freemarkerLang'
 import { useDomTreeStore } from '../stores/domTree'
 import { useProjectStore } from '../stores/project'
@@ -10,6 +13,9 @@ import { useIframeSync } from '../composables/useIframeSync'
 
 hljs.registerLanguage('html', xml)
 hljs.registerLanguage('ftl', freemarkerLang)
+hljs.registerLanguage('css', css)
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('json', json)
 
 const domTreeStore = useDomTreeStore()
 const projectStore = useProjectStore()
@@ -19,6 +25,11 @@ const { setIframeRef, highlight, unhighlight, prepareHtmlForPreview } = useIfram
 const iframeEl = ref<HTMLIFrameElement | null>(null)
 const previousSelectedId = ref<string | null>(null)
 const viewMode = ref<'preview' | 'source'>('preview')
+
+const isHtmlFile = computed(() => {
+  const name = projectStore.currentFileName || ''
+  return name.endsWith('.html') || name.endsWith('.htm') || name.endsWith('.ftl') || name.endsWith('.ftlh')
+})
 
 const selectedLabel = computed(() => {
   const node = domTreeStore.selectedNode
@@ -43,17 +54,28 @@ const previewHtml = computed(() => {
 })
 
 const sourceCode = computed(() => {
-  const tree = domTreeStore.domTree
-  if (tree.length === 0) return ''
-  return domTreeToHtml(tree)
+  if (isHtmlFile.value) {
+    const tree = domTreeStore.domTree
+    if (tree.length === 0) return ''
+    return domTreeToHtml(tree)
+  }
+  return projectStore.currentFileContent || ''
 })
 
 const highlightedSource = computed(() => {
   const code = sourceCode.value
   if (!code) return ''
   const fileName = projectStore.currentFileName || ''
-  const isFtl = fileName.endsWith('.ftl') || fileName.endsWith('.ftlh')
-  const lang = isFtl ? 'ftl' : 'html'
+  let lang = 'html'
+  if (fileName.endsWith('.ftl') || fileName.endsWith('.ftlh')) {
+    lang = 'ftl'
+  } else if (fileName.endsWith('.css')) {
+    lang = 'css'
+  } else if (fileName.endsWith('.js')) {
+    lang = 'javascript'
+  } else if (fileName.endsWith('.json')) {
+    lang = 'json'
+  }
   try {
     return hljs.highlight(code, { language: lang }).value
   } catch {
@@ -117,13 +139,16 @@ onUnmounted(() => {
       </span>
     </div>
     <iframe
-      v-if="viewMode === 'preview'"
+      v-if="viewMode === 'preview' && isHtmlFile"
       ref="iframeEl"
       class="preview-iframe"
       sandbox="allow-scripts allow-same-origin"
       :srcdoc="previewHtml"
       @load="onIframeLoad"
     />
+    <div v-else-if="viewMode === 'preview' && !isHtmlFile" class="no-preview">
+      此文件类型不支持预览，请切换到源码查看
+    </div>
     <div v-else class="source-view">
       <pre class="source-code"><code v-html="highlightedSource"></code></pre>
     </div>
@@ -196,6 +221,15 @@ onUnmounted(() => {
   border: none;
   width: 100%;
   background: #fff;
+}
+
+.no-preview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #909399;
+  font-size: 13px;
 }
 
 .source-view {
