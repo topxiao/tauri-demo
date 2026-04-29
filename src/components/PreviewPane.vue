@@ -12,8 +12,8 @@ const { setIframeRef, highlight, unhighlight, prepareHtmlForPreview } = useIfram
 
 const iframeEl = ref<HTMLIFrameElement | null>(null)
 const previousSelectedId = ref<string | null>(null)
+const viewMode = ref<'preview' | 'source'>('preview')
 
-/** Selected node description for the status bar */
 const selectedLabel = computed(() => {
   const node = domTreeStore.selectedNode
   if (!node) return ''
@@ -29,7 +29,6 @@ const selectedLabel = computed(() => {
   return label
 })
 
-/** Build the HTML to display inside the iframe */
 const previewHtml = computed(() => {
   const tree = domTreeStore.domTree
   if (tree.length === 0) return ''
@@ -37,12 +36,16 @@ const previewHtml = computed(() => {
   return prepareHtmlForPreview(rawHtml, tree)
 })
 
-/** Handle iframe load: set ref and start listening for messages */
+const sourceCode = computed(() => {
+  const tree = domTreeStore.domTree
+  if (tree.length === 0) return ''
+  return domTreeToHtml(tree)
+})
+
 function onIframeLoad() {
   setIframeRef(iframeEl.value)
 }
 
-/** Handle postMessage from iframe (element clicks / selection cleared) */
 function handleMessage(e: MessageEvent) {
   if (!e.data || !e.data.type) return
   if (e.data.type === 'elementClicked' && e.data.nodeId) {
@@ -52,7 +55,6 @@ function handleMessage(e: MessageEvent) {
   }
 }
 
-/** Watch selection changes to highlight/unhighlight */
 watch(
   () => domTreeStore.selectedNodeId,
   (newId) => {
@@ -78,21 +80,34 @@ onUnmounted(() => {
 <template>
   <div class="preview-pane">
     <div class="preview-status-bar">
+      <div class="mode-toggle">
+        <button
+          :class="['toggle-btn', { active: viewMode === 'preview' }]"
+          @click="viewMode = 'preview'"
+        >预览</button>
+        <button
+          :class="['toggle-btn', { active: viewMode === 'source' }]"
+          @click="viewMode = 'source'"
+        >源码</button>
+      </div>
       <span v-if="projectStore.currentFileName" class="preview-file-name">
-        预览：{{ projectStore.currentFileName }}
+        {{ projectStore.currentFileName }}
       </span>
-      <span v-else class="preview-file-name">预览</span>
-      <span v-if="selectedLabel" class="preview-selected">
-        ● 已选中: {{ selectedLabel }}
+      <span v-if="selectedLabel && viewMode === 'preview'" class="preview-selected">
+        ● {{ selectedLabel }}
       </span>
     </div>
     <iframe
+      v-if="viewMode === 'preview'"
       ref="iframeEl"
       class="preview-iframe"
       sandbox="allow-scripts allow-same-origin"
       :srcdoc="previewHtml"
       @load="onIframeLoad"
     />
+    <div v-else class="source-view">
+      <pre class="source-code">{{ sourceCode }}</pre>
+    </div>
   </div>
 </template>
 
@@ -116,6 +131,38 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
+.mode-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid #dcdfe6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  padding: 2px 12px;
+  border: none;
+  background: #fff;
+  color: #606266;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+}
+
+.toggle-btn:first-child {
+  border-right: 1px solid #dcdfe6;
+}
+
+.toggle-btn:hover {
+  color: #409eff;
+}
+
+.toggle-btn.active {
+  background: #409eff;
+  color: #fff;
+}
+
 .preview-file-name {
   font-weight: 500;
   color: #303133;
@@ -130,5 +177,22 @@ onUnmounted(() => {
   border: none;
   width: 100%;
   background: #fff;
+}
+
+.source-view {
+  flex: 1;
+  overflow: auto;
+  background: #1e1e1e;
+  padding: 12px;
+}
+
+.source-code {
+  margin: 0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d4d4d4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>
