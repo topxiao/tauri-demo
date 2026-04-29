@@ -279,7 +279,7 @@ onUnmounted(() => {
 .center-panel {
   flex: 1;
   min-width: 400px;
-  padding: 12px;
+  padding: 0 0 2px;
   overflow: auto;
   display: flex;
   flex-direction: column;

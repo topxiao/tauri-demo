@@ -81,7 +81,7 @@ function handleStylePropertyChange(property: string, value: string) {
 }
 
 .element-info {
-  padding: 8px 12px;
+  padding: 4px 12px 2.4px;
   border-bottom: 1px solid #e4e7ed;
   background: #f5f7fa;
   flex-shrink: 0;
@@ -89,7 +89,7 @@ function handleStylePropertyChange(property: string, value: string) {
 
 .element-tag {
   font-family: monospace;
-  font-size: 13px;
+  font-size: 12px;
   color: #303133;
 }
 </style>

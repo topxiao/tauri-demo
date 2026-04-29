@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import FileExplorer from './FileExplorer.vue'
 import DomTree from './DomTree.vue'
 
-const activeTab = ref<'dom' | 'files'>('dom')
+const activeTab = ref<'dom' | 'files'>('files')
 </script>
 
 <template>
@@ -11,13 +11,13 @@ const activeTab = ref<'dom' | 'files'>('dom')
     <div class="left-header">
       <div class="mode-toggle">
         <button
-          :class="['toggle-btn', { active: activeTab === 'dom' }]"
-          @click="activeTab = 'dom'"
-        >DOM 树</button>
-        <button
           :class="['toggle-btn', { active: activeTab === 'files' }]"
           @click="activeTab = 'files'"
         >文件</button>
+        <button
+          :class="['toggle-btn', { active: activeTab === 'dom' }]"
+          @click="activeTab = 'dom'"
+        >DOM 树</button>
       </div>
     </div>
     <div class="left-content">
@@ -35,9 +35,14 @@ const activeTab = ref<'dom' | 'files'>('dom')
 }
 
 .left-header {
-  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px;
   border-bottom: 1px solid #e4e7ed;
   background: #f5f7fa;
+  font-size: 13px;
+  color: #606266;
   flex-shrink: 0;
 }
 
@@ -50,7 +55,7 @@ const activeTab = ref<'dom' | 'files'>('dom')
 }
 
 .toggle-btn {
-  padding: 3px 14px;
+  padding: 2px 12px;
   border: none;
   background: #fff;
   color: #606266;
