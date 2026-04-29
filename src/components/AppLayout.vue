@@ -213,22 +213,6 @@ onUnmounted(() => {
 
 <template>
   <div class="app-layout">
-    <header class="top-bar">
-      <el-button size="small" @click="projectStore.openFolder()">
-        打开文件夹
-      </el-button>
-      <span class="file-name">
-        {{ projectStore.currentFileName }}
-        <span v-if="projectStore.isDirty" class="dirty-mark"> *</span>
-      </span>
-      <el-button
-        size="small"
-        :disabled="!projectStore.isDirty || !projectStore.currentFilePath"
-        @click="saveCurrentFile"
-      >
-        保存 Ctrl+S
-      </el-button>
-    </header>
     <div class="main-content">
       <LeftPanel class="left-panel" />
       <div class="center-panel">
@@ -247,30 +231,6 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-}
-
-.top-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 6px 12px;
-  border-bottom: 1px solid #e4e7ed;
-  background: #f5f7fa;
-  flex-shrink: 0;
-}
-
-.file-name {
-  flex: 1;
-  font-size: 14px;
-  color: #303133;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dirty-mark {
-  color: #e6a23c;
-  font-weight: bold;
 }
 
 .main-content {

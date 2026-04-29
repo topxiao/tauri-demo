@@ -137,6 +137,12 @@ onUnmounted(() => {
       <span v-if="selectedLabel && viewMode === 'preview'" class="preview-selected">
         ● {{ selectedLabel }}
       </span>
+      <span class="spacer"></span>
+      <button
+        class="save-btn"
+        :disabled="!projectStore.isDirty || !projectStore.currentFilePath"
+        @click="window.dispatchEvent(new CustomEvent('app-save'))"
+      >保存</button>
     </div>
     <iframe
       v-if="viewMode === 'preview' && isHtmlFile"
@@ -205,6 +211,32 @@ onUnmounted(() => {
 .toggle-btn.active {
   background: #409eff;
   color: #fff;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.save-btn {
+  padding: 2px 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 3px;
+  background: #fff;
+  color: #606266;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+}
+
+.save-btn:hover:not(:disabled) {
+  color: #409eff;
+  border-color: #409eff;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .preview-file-name {
