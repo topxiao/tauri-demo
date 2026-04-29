@@ -19,7 +19,28 @@ const contextMenu = ref({
 const inlineEditId = ref<string | null>(null)
 const inlineEditText = ref('')
 
-const treeData = computed(() => domTreeStore.domTree)
+const HIDDEN_TAGS = new Set([
+  'html', 'head', 'body', 'meta', 'title', 'link', 'script', 'style',
+  'base', 'noscript', 'template', 'br', 'hr', 'wbr',
+])
+
+function filterTree(nodes: DomNode[]): DomNode[] {
+  return nodes
+    .filter((node) => {
+      if (node.type === 'element' && node.tagName && HIDDEN_TAGS.has(node.tagName.toLowerCase())) {
+        return false
+      }
+      return true
+    })
+    .map((node) => {
+      if (node.children) {
+        return { ...node, children: filterTree(node.children) }
+      }
+      return node
+    })
+}
+
+const treeData = computed(() => filterTree(domTreeStore.domTree))
 
 const hasSelection = computed(() => domTreeStore.selectedNodeId !== null)
 
