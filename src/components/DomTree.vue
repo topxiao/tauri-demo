@@ -20,24 +20,32 @@ const inlineEditId = ref<string | null>(null)
 const inlineEditText = ref('')
 
 const HIDDEN_TAGS = new Set([
-  'html', 'head', 'body', 'meta', 'title', 'link', 'script', 'style',
+  'head', 'meta', 'title', 'link', 'script', 'style',
   'base', 'noscript', 'template', 'br', 'hr', 'wbr',
 ])
 
+const UNWRAP_TAGS = new Set(['html', 'body'])
+
 function filterTree(nodes: DomNode[]): DomNode[] {
-  return nodes
-    .filter((node) => {
-      if (node.type === 'element' && node.tagName && HIDDEN_TAGS.has(node.tagName.toLowerCase())) {
-        return false
+  const result: DomNode[] = []
+  for (const node of nodes) {
+    if (node.type === 'element' && node.tagName) {
+      const tag = node.tagName.toLowerCase()
+      if (HIDDEN_TAGS.has(tag)) continue
+      if (UNWRAP_TAGS.has(tag)) {
+        if (node.children) {
+          result.push(...filterTree(node.children))
+        }
+        continue
       }
-      return true
-    })
-    .map((node) => {
-      if (node.children) {
-        return { ...node, children: filterTree(node.children) }
-      }
-      return node
-    })
+    }
+    if (node.children) {
+      result.push({ ...node, children: filterTree(node.children) })
+    } else {
+      result.push(node)
+    }
+  }
+  return result
 }
 
 const treeData = computed(() => filterTree(domTreeStore.domTree))
