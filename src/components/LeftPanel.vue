@@ -2,8 +2,9 @@
 import { ref } from 'vue'
 import FileExplorer from './FileExplorer.vue'
 import DomTree from './DomTree.vue'
+import TemplatePanel from './TemplatePanel.vue'
 
-const activeTab = ref<'dom' | 'files'>('files')
+const activeTab = ref<'dom' | 'files' | 'templates'>('files')
 </script>
 
 <template>
@@ -18,10 +19,15 @@ const activeTab = ref<'dom' | 'files'>('files')
           :class="['toggle-btn', { active: activeTab === 'dom' }]"
           @click="activeTab = 'dom'"
         >DOM 树</button>
+        <button
+          :class="['toggle-btn', { active: activeTab === 'templates' }]"
+          @click="activeTab = 'templates'"
+        >模板</button>
       </div>
     </div>
     <div class="left-content">
       <DomTree v-if="activeTab === 'dom'" />
+      <TemplatePanel v-else-if="activeTab === 'templates'" />
       <FileExplorer v-else />
     </div>
   </div>

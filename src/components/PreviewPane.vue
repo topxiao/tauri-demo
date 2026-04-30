@@ -109,6 +109,10 @@ watch(
   },
 )
 
+function handleSave() {
+  window.dispatchEvent(new CustomEvent('app-save'))
+}
+
 onMounted(() => {
   window.addEventListener('message', handleMessage)
 })
@@ -141,7 +145,7 @@ onUnmounted(() => {
       <button
         class="save-btn"
         :disabled="!projectStore.isDirty || !projectStore.currentFilePath"
-        @click="window.dispatchEvent(new CustomEvent('app-save'))"
+        @click="handleSave"
       >保存</button>
     </div>
     <iframe

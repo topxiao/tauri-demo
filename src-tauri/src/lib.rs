@@ -92,6 +92,28 @@ fn write_file(file_path: String, content: String) -> Result<(), String> {
         .map_err(|e| format!("Failed to write file {}: {}", file_path, e))
 }
 
+#[tauri::command]
+fn list_subdirs(dir_path: String) -> Result<Vec<String>, String> {
+    let path = Path::new(&dir_path);
+    if !path.is_dir() {
+        return Err(format!("{} is not a directory", dir_path));
+    }
+    let mut names: Vec<String> = Vec::new();
+    let entries = fs::read_dir(path).map_err(|e| format!("Failed to read dir: {}", e))?;
+    for entry in entries {
+        let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name.starts_with('.') {
+            continue;
+        }
+        if entry.path().is_dir() {
+            names.push(name);
+        }
+    }
+    names.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+    Ok(names)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -101,6 +123,7 @@ pub fn run() {
             list_files,
             read_file,
             write_file,
+            list_subdirs,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -154,6 +154,21 @@ export const useDomTreeStore = defineStore('domTree', () => {
     siblings.splice(newIndex, 0, moved)
   }
 
+  function insertNodes(parentId: string | null, nodes: DomNode[]) {
+    pushSnapshot()
+    if (parentId) {
+      const parent = findNode(domTree.value, parentId)
+      if (!parent) return
+      if (!parent.children) parent.children = []
+      for (const node of nodes) {
+        node.parentId = parentId
+        parent.children.push(node)
+      }
+    } else {
+      domTree.value.push(...nodes)
+    }
+  }
+
   return {
     domTree,
     selectedNodeId,
@@ -170,6 +185,7 @@ export const useDomTreeStore = defineStore('domTree', () => {
     updateNodeAttribute,
     updateNodeText,
     reorderSibling,
+    insertNodes,
     pushSnapshot,
     undo,
     redo,
